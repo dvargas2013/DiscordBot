@@ -8,7 +8,8 @@ ____
 ```
 ClientID = "[15 digit discord id of your bot]"
  # Secret was not used but it is a character string about 32 in length
-Token = "[60 character string]" ```
+Token = "[60 character string]"
+```
 ____
 ### Minor Customizations
 You can create a file called ***EditPermission.ids*** with Discord IDs on seperate lines that are allowed to add and delete Reactions from the bot. It's not necessary since the non existence of the file is an indicator that anyone can edit.  
