@@ -27,11 +27,13 @@ from constants import Token
 # Token is about 60 characters long
 # Secret is about 32 characters
 # ClientID is 18 characters long
+terminal = 0
 
-from discord.utils import find
-from threading import Thread
-Thread(target = lambda: client.run(Token)).start()
-RUN = client.loop.create_task
-from done.String import showInfo
-
-#client.run(Token)
+if terminal:
+    from discord.utils import find
+    from threading import Thread
+    Thread(target = lambda: client.run(Token)).start()
+    RUN = client.loop.create_task
+    from done.String import showInfo
+else:
+    client.run(Token)
