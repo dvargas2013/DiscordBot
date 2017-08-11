@@ -11,8 +11,8 @@ client = discord.Client()
 async def on_message(message):
     if message.author.bot or message.author == client.user: return
     
-    # global M
-    # M = message
+    global M
+    M = message
     
     # Emoji/Trigger Holder
     if message.server:
