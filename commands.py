@@ -19,18 +19,18 @@ Thread(target = writeReactions).start()
 
 from os.path import exists
 def read(f="EditPermission.ids"):
-    if not exists(f): yield '174867952699441152'
-    else:
+    if exists(f):
         with open(f,'r') as fi:
             yield from fi.readlines()
 
 EditPerms = set(i.strip() for i in read())
 
+def canEdit(message): return bool(EditPerms) and message.author.id not in EditPerms
 def isEmoji(x): return all(ord(x) > 255 for x in x)
 def listify(C): return ", ".join('%s'%r for r in sorted(C))
 async def add(client,message,splits):
     m = 'Usage: "%s add [emoji] [trigger]"'%client.user.mention
-    if message.author.id not in EditPerms:
+    if canEdit(message):
         m = "You dont have permission to Edit Entries"
     elif len(splits)>1:
         emoji = ""
@@ -64,7 +64,7 @@ async def show(client,message,splits):
             else: m = '"%s" doesn\'t trigger anything ... yet'%trigger
     await client.send_message(message.channel,m)
 async def delete(client,message,splits):
-    if message.author.id not in EditPerms:
+    if canEdit(message):
         m = "You dont have permission to Edit Entries"
     elif not splits or len(splits) > 2:
         m = 'Usage: "{0} del [emoji]" or "{0} del [trigger]"'.format(client.user.mention)
