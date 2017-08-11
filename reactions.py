@@ -50,6 +50,7 @@ class Reactions():
         if self.dirty:
             self.dirty = 0
             with open(f,'wb') as fi: fi.write(dumps(self))
+            print("Saved "+f)
     def read(f="reactions.data"):
         if not exists(f):
             print("No Reaction Data")

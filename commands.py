@@ -30,15 +30,14 @@ async def add(client,message,splits):
         m = "You dont have permission to Edit Entries"
     elif len(splits)>1:
         emoji = ""
-        for i in splits: # find and remove the emoji
-            if isEmoji(i):
-                emoji = i
-                splits.remove(emoji)
-                break
-        if emoji and splits:
-            trigger = splits[0]
-            Reactions.add(trigger,emoji)
-            m = "Added %s and %s "%(emoji,trigger)
+        emojis = [i for i in splits if isEmoji(i)] # find and remove the emoji
+        for e in emojis: splits.remove(e)
+        triggers = splits
+        
+        for e in emojis:
+            for t in triggers:
+                Reactions.add(t,e)
+        m = "Added %s and %s"%(listify(emojis),listify(triggers))
     await client.send_message(message.channel,m)
 async def show(client,message,splits):
     if not splits:
@@ -78,7 +77,7 @@ async def delete(client,message,splits):
         if not C: m = repr(s0)+none
         elif len(C) == 1:
             rem(s0)
-            repr(s0)+" has been removed"
+            m = repr(s0)+" has been removed"
         else:
             m = repr(s0)+sure+listify(C)+". Are you sure you want to remove?"
             await client.send_message(message.channel,m)
