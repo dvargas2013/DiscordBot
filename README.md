@@ -5,9 +5,9 @@ ____
 * Install [discord.py](https://github.com/Rapptz/discord.py) (Note: You don't need the voice one. But if that's the direction you're going be my guest)
 * Hopefully you already have you're [Discord Bot](https://discordapp.com/developers/applications/me)'s ClientID and Token ready and waiting ;P
 * Create a ***constants.py*** file  
-```ClientID = "[15 digit discord id of your bot]"
+``` ClientID = "[15 digit discord id of your bot]"
  # Secret was not used but it is a character string about 32 in length
-Token = "[60 character string]"```
+Token = "[60 character string]" ```
 ____
 ### Minor Customizations
 You can create a file called ***EditPermission.ids*** with Discord IDs on seperate lines that are allowed to add and delete Reactions from the bot. It's not necessary since the non existence of the file is an indicator that anyone can edit.  
