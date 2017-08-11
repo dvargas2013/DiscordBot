@@ -13,17 +13,29 @@ def writeReactions():
         sleep(60) # write every minute
 Thread(target = writeReactions).start()
 
+from os.path import exists
+def read(f="EditPermission.ids"):
+    if not exists(f): yield '174867952699441152'
+    else:
+        with open(f,'r') as fi:
+            yield from fi.readlines()
+
+EditPerms = set(i.strip() for i in read())
+
 def isEmoji(x): return len(x) == 1 and ord(x) > 255
 def listify(C): return ", ".join('%r'%r for r in sorted(C))
 async def add(client,message,splits):
     m = 'Usage: "%s add [emoji] [trigger]"'%client.user.mention
-    if len(splits)>1:
+    if message.author.id not in EditPerms:
+        m = "You dont have permission to Edit Entries"
+    elif len(splits)>1:
+        emoji = ""
         for i in splits: # find and remove the emoji
             if isEmoji(i):
                 emoji = i
+                splits.remove(emoji)
                 break
-        splits.remove(emoji)
-        if splits:
+        if emoji and splits:
             trigger = splits[0]
             Reactions.add(trigger,emoji)
             m = "Added %s and %s "%(emoji,trigger)
@@ -45,7 +57,9 @@ async def show(client,message,splits):
         else:      m = repr(trigger)+" doesn't trigger anything ... yet"
     await client.send_message(message.channel,m)
 async def delete(client,message,splits):
-    if not splits or len(splits) > 2:
+    if message.author.id not in EditPerms:
+        m = "You dont have permission to Edit Entries"
+    elif not splits or len(splits) > 2:
         m = 'Usage: "{0} del [emoji]" or "{0} del [trigger]"'.format(client.user.mention)
     else:
         if isEmoji(splits[0]):
@@ -71,11 +85,10 @@ async def delete(client,message,splits):
             msg = await client.wait_for_message(timeout=10,author=message.author,channel=message.channel,
             check=lambda m: 'yes' in m.clean_content.lower() or 'no' in m.clean_content.lower())
             if msg == None: m = "Looks like I'm not deleting "+repr(s0)+" any time soon"
-            else:
-                if 'yes' in msg.clean_content.lower():
-                    rem(s0)
-                    m = repr(s0)+" has been removed"
-                else: m = " Deletion of "+repr(s0)+" has been canceled"
+            elif 'yes' in msg.clean_content.lower():
+                rem(s0)
+                m = repr(s0)+" has been removed"
+            else: m = " Deletion of "+repr(s0)+" has been canceled"
     await client.send_message(message.channel,m)
 
 async def command(client,message):
