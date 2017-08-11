@@ -97,13 +97,17 @@ async def delete(client,message,splits):
                 m = '"%s" has been removed'%s0
             else: m = 'Deletion of "%s" has been canceled'%s0
     await client.send_message(message.channel,m)
-
+async def repeat(client,message,splits):
+    m = message.content[message.content.find(" ",message.content.find(" ")+1)+1:]
+    await client.send_message(message.channel,m)
+    await client.delete_message(message)
 async def command(client,message):
     splits = [i for i in message.content.lower().translate(puncRemover).split() if len(i)<15]
     if splits[0] in ['add','set']: await add(client,message,splits[1:])
     elif splits[0] in ['show','get']: await show(client,message,splits[1:])
     elif splits[0] in ['remove','delete','del']: await delete(client,message,splits[1:])
-    else: await client.send_message(message.channel,'I didn\'t understand that 😦 \n Usage: "%s add/show/del"'%client.user.mention)
+    elif splits[0] in ['say','repeat']: await repeat(client,message,splits[1:])
+    else: await client.send_message(message.channel,'I didn\'t understand that 😦 \n Usage: "%s add/show/del/say"'%client.user.mention)
 async def react(client,message):
     # It's just a regular message nothing else to do but add a reaction
     T = list(Reactions.getTriggersFromMessage(message.content))
