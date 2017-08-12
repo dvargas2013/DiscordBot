@@ -30,7 +30,7 @@ from constants import ClientID,Token
 # Secret is about 32 characters
 # ClientID is 18 characters long
 
-__doc__ = '''https://discordapp.com/oauth2/authorize?&client_id=%s&scope=bot&permissions=0'''%ClientID
+__doc__ = '''https://discordapp.com/oauth2/authorize?&client_id=%s&scope=bot&permissions=11328'''%ClientID
 
 client = discord.Client()
 @client.event
