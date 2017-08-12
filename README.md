@@ -3,7 +3,7 @@ ____
 ## Getting Started
 * Have [Python 3.5](https://www.python.org/downloads/) or Greater installed
 * Install [discord.py](https://github.com/Rapptz/discord.py) (Note: You don't need the voice one. But if that's the direction you're going be my guest)
-* Hopefully you already have you're [Discord Bot](https://discordapp.com/developers/applications/me)'s ClientID and Token ready and waiting ;P
+* Hopefully you already have your [Discord Bot](https://discordapp.com/developers/applications/me)'s ClientID and Token ready and waiting ;P
 * Create a ***constants.py*** file  
 ```
 ClientID = "[15 digit discord id of your bot]"

@@ -1,4 +1,29 @@
 #!/usr/bin/env python3
+import sys
+DEBUG = len(sys.argv) > 1
+
+def pidcheckill():
+    # If there is an already running Python with the pid in the pid file
+    # Kill it . There can be only 1
+    import os
+    from os.path import exists
+    from subprocess import check_output
+    if os.path.exists('DzvBotMain.pid'): # If it doesnt exist skip to where you make one
+        pid = None # if it does exists, open it and get the pid
+        with open('DzvBotMain.pid',"r") as f: pid = int(f.readline().strip())
+        if pid: # if it was empty for some reason ... just skip to overwriting it
+            proc = check_output("ps aux | awk -v P=%s '$2 == P { print }'"%pid,shell=True).decode()
+            if proc and 'Python' in proc:
+                print("Another Bot Process is already Active")
+                # If there is an error in here
+                # IE it fails to kill for permissions error or something
+                # I hope it crashes this one and allows the other one to run
+                # Worst case 1: Both stay running duplicating messages
+                # Worst case 2: Both are killed nothing runs
+                os.system("kill -TERM %s"%pid)
+    with open('DzvBotMain.pid',"w") as f: f.write(str(os.getpid()))
+pidcheckill() 
+
 import discord
 import asyncio
 from commands import command, react
@@ -9,9 +34,6 @@ from constants import ClientID,Token
 # ClientID is 18 characters long
 
 __doc__ = '''https://discordapp.com/oauth2/authorize?&client_id=%s&scope=bot&permissions=0'''%ClientID
-
-import sys
-DEBUG = len(sys.argv) > 1
 
 client = discord.Client()
 @client.event

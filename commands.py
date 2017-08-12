@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 import discord
 import asyncio
-from random import sample
+from random import sample # Used when returning 10 random triggers
 
-from reactions import Reactions
-Reactions = Reactions.read()
-
+# punctuation remover. use "[string]".translate(puncRemover)
 from string import punctuation
 puncRemover = str.maketrans('','',punctuation)
 
+# Data Storage Device
+from reactions import Reactions
+Reactions = Reactions.read()
+
+# Make sure Reactions is being constantly updated
 from threading import Thread
 from time import sleep
 def writeReactions():
@@ -17,12 +20,20 @@ def writeReactions():
         sleep(60) # write every minute
 Thread(target = writeReactions).start()
 
+# If you try to end my life ... At least let me write first
+import signal
+def sigterm(signal, frame):
+    print("writing")
+    Reactions.write()
+    exit(0)
+signal.signal(signal.SIGTERM, sigterm)
+
+# List of People's IDs that can edit the bot
 from os.path import exists
 def read(f="EditPermission.ids"):
     if exists(f):
         with open(f,'r') as fi:
             yield from fi.readlines()
-
 EditPerms = set(i.strip() for i in read())
 
 def cantEdit(message):
@@ -114,7 +125,9 @@ async def command(client,message):
     elif splits[0] in ['show','get']: await show(client,message,splits[1:])
     elif splits[0] in ['remove','delete','del']: await delete(client,message,splits[1:])
     elif splits[0] in ['say','repeat']: await repeat(client,message,splits[1:])
-    else: await client.send_message(message.channel,'I didn\'t understand that 😦 \n Usage: "%s add/show/del/say"'%client.user.mention)
+    else:
+        usage = "show/say" if cantEdit(message) else "add/show/del/say"
+        await client.send_message(message.channel,'I didn\'t understand that 😦 \n Usage: "%s %s"'%(client.user.mention,usage))
 async def react(client,message):
     # It's just a regular message nothing else to do but add a reaction
     T = list(Reactions.getTriggersFromMessage(message.content))
