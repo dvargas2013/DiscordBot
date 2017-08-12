@@ -18,14 +18,15 @@ def writeReactions():
     while 1:
         Reactions.write() # it has a internal dirty bit
         sleep(60) # write every minute
-Thread(target = writeReactions).start()
+Thread(target = writeReactions, daemon=True).start()
 
 # If you try to end my life ... At least let me write first
 import signal
+import sys
 def sigterm(signal, frame):
     print("writing")
     Reactions.write()
-    exit(0)
+    sys.exit(0)
 signal.signal(signal.SIGTERM, sigterm)
 
 # List of People's IDs that can edit the bot

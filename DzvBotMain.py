@@ -6,15 +6,18 @@ def pidcheckill():
     # If there is an already running Python with the pid in the pid file
     # Kill it . There can be only 1
     import os
+    import signal
     from subprocess import check_output
     if os.path.exists('DzvBotMain.pid'): # If it doesnt exist skip to where you make one
         pid = None # if it does exists, open it and get the pid
-        with open('DzvBotMain.pid',"r") as f: pid = int(f.readline().strip())
+        try:
+            with open('DzvBotMain.pid',"r") as f: pid = int(f.readline().strip())
+        except: pass
         if pid: # if it was empty for some reason ... just skip to overwriting it
             proc = check_output("ps aux | awk -v P=%s '$2 == P { print }'"%pid,shell=True).decode()
             if proc and 'Python' in proc:
                 print("Another Bot Process is already Active") # Worst case 1: Both stay running duplicating messages
-                os.system("kill -TERM %s"%pid) # Worst case 2: Both are killed nothing runs
+                os.kill(pid, signal.SIGTERM) # Worst case 2: Both are killed nothing runs
     with open('DzvBotMain.pid',"w") as f: f.write(str(os.getpid()))
 pidcheckill() 
 
@@ -45,13 +48,13 @@ async def on_message(message):
     else: # If not mentioned I might react c;
         await react(client,message)
 
+from threading import Thread
+# I dont run it directly cause I don't trust it to die on SIGTERM
+t = Thread(target = lambda: client.run(Token), daemon=True)
+t.start()
+
 if DEBUG:
     print(__doc__)
     from discord.utils import find # when you have a list of stuff to look through use find to find stuff for you
-    # dont block the interactive
-    from threading import Thread
-    Thread(target = lambda: client.run(Token)).start()
     RUN = client.loop.create_task # A lot of coroutines cant be run directly. Use this to run them
-else:
-    # this is a blocking call
-    client.run(Token)
+else: t.join()
