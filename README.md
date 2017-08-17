@@ -12,7 +12,8 @@ Token = "[60 character string]"
 ```
 ____
 ## Minor Customizations
-You can create a file called ***EditPermission.ids*** with Discord IDs on seperate lines that are allowed to add and delete Reactions from the bot. It's not necessary since the non existence of the file is an indicator that anyone can edit.  
+* You can create a file called ***EditPermission.ids*** with Discord IDs on seperate lines that are allowed to add and delete Reactions from the bot. It's not necessary since the non existence of the file is an indicator that anyone can edit.  
+* You may use my [reactions.data](https://www.dropbox.com/s/9g25ke0g90sh32s/reactions.data?dl=0) or you may start your own. It's your choice. Using the bot commands to add and remove isn't that difficult to populate the bot with enough reactions to be cool.
 ____
 ## Running
 The .shexe files are just text files with sh/bash in them. I have my computer set up to run them on double clicks which is why they have that weird extension.  
