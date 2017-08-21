@@ -42,7 +42,7 @@ async def on_message(message):
         M = message
 
     # If I was mentioned you want me to do something
-    if client.user.mentioned_in(message):
+    if client.user.mentioned_in(message) and client.user in message.mentions:
         if DEBUG: print(message.clean_content)
         await command(client,message)
     else: # If not mentioned I might react c;
