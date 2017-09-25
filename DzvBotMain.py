@@ -2,47 +2,59 @@
 import sys
 DEBUG = len(sys.argv) > 1
 
-def pidcheckill():
-    # If there is an already running Python with the pid in the pid file
-    # Kill it . There can be only 1
-    import os
-    import signal
-    from subprocess import check_output
-    if os.path.exists('DzvBotMain.pid'): # If it doesnt exist skip to where you make one
-        pid = None # if it does exists, open it and get the pid
-        try:
-            with open('DzvBotMain.pid',"r") as f: pid = int(f.readline().strip())
-        except: pass
-        if pid: # if it was empty for some reason ... just skip to overwriting it
-            proc = check_output("ps aux | awk -v P=%s '$2 == P { print }'"%pid,shell=True).decode()
-            if proc and 'Python' in proc:
-                print("Another Bot Process is already Active") # Worst case 1: Both stay running duplicating messages
-                os.kill(pid, signal.SIGTERM) # Worst case 2: Both are killed nothing runs
-    with open('DzvBotMain.pid',"w") as f: f.write(str(os.getpid()))
-pidcheckill() 
+import random
+# 64 bits of randomness
+CUR = random.randrange(2**(8*64)).to_bytes(64,'little')
+
+double_stopper = "DzvBotMain.pid"
+
+import os
+def chdir():
+    d = os.path.split(__file__)[0]
+    if d: os.chdir(d)
+chdir()
+print("Current Directory Set To:",os.getcwd())
+if not os.path.exists(double_stopper): 
+    with open(double_stopper, "wb") as f: f.write(CUR)
+print()
+
+import mmap
+mmapfile = open(double_stopper, "r+b")
+MM = mmap.mmap(mmapfile.fileno(), 0)
+MM[:64] = CUR
+# if the MM doesnt equal CUR anymore that means someone else started running
+
+def checkConstants(cfile="constants.py"):
+    if os.path.exists(cfile): return
+    print("Go to https://discordapp.com/developers/applications/me and get the ClientID and Token")
+    ClientID = input("ClientID: ")
+    Token = input("Token: ")
+    with open(cfile,"w") as f: f.write("ClientID = '%s'\nToken = '%s'"%(ClientID,Token))
+checkConstants()
+
+from constants import ClientID,Token
 
 import discord
 import asyncio
 from commands import command, react
-
-from constants import ClientID,Token
-# Token is about 60 characters long
-# Secret is about 32 characters
-# ClientID is 18 characters long
 
 __doc__ = '''https://discordapp.com/oauth2/authorize?&client_id=%s&scope=bot&permissions=11328'''%ClientID
 
 client = discord.Client()
 @client.event
 async def on_message(message):
+    if MM[:64] != CUR:
+        await client.logout()
+        return
+
     if message.author.bot or message.author == client.user: return
-    
+
     if DEBUG:
         global M
         M = message
 
     # If I was mentioned you want me to do something
-    if client.user.mentioned_in(message) and client.user in message.mentions:
+    if (client.user.mentioned_in(message) and client.user in message.mentions) or message.channel.is_private:
         if DEBUG: print(message.clean_content)
         await command(client,message)
     else: # If not mentioned I might react c;
@@ -58,3 +70,5 @@ if DEBUG:
     from discord.utils import find # when you have a list of stuff to look through use find to find stuff for you
     RUN = client.loop.create_task # A lot of coroutines cant be run directly. Use this to run them
 else: t.join()
+
+mmapfile.close()
