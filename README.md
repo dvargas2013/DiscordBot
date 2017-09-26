@@ -4,15 +4,16 @@ ____
 * Have [Python 3.5](https://www.python.org/downloads/) or Greater installed
 * Install [discord.py](https://github.com/Rapptz/discord.py) (Note: You don't need the voice one. But if that's the direction you're going be my guest)
 * Hopefully you already have your [Discord Bot](https://discordapp.com/developers/applications/me)'s ClientID and Token ready and waiting ;P
-* Create a ***constants.py*** file  
+* When you first run it it will ask for a ClientID and Token. These things will save in a ***constants.py*** file
 ```
 ClientID = "[15 digit discord id of your bot]"
- # Secret was not used but it is a character string about 32 in length
 Token = "[60 character string]"
 ```
 ____
 ## Minor Customizations
-* You can create a file called ***EditPermission.ids*** with Discord IDs on seperate lines that are allowed to add and delete Reactions from the bot. It's not necessary since the non existence of the file is an indicator that anyone can edit.  
+* You can create a file called ***EditPermission.ids*** with Discord IDs on separate lines that are allowed to add and delete Reactions from the bot. It's not necessary since the non existence of the file is an indicator that anyone can edit.  
+* You can create a file called ***DontReactChats.ids*** with Channel IDs where you don't want the bot to attach reactions to.
+* You can create a file called ***DrinkingAllowed.ids*** with Channel IDs where saying the word "DRINK" makes the author of the message increment a drink counter.
 * You may use my [reactions.data](https://www.dropbox.com/s/9g25ke0g90sh32s/reactions.data?dl=0) or you may start your own. It's your choice. Using the bot commands to add and remove isn't that difficult to populate the bot with enough reactions to be cool.
 ____
 ## Running
@@ -25,6 +26,7 @@ If you just want to run it in the background without a terminal just run `python
 That's all the .shexe files do. Look at em if you dont believe me ;P  
 ____
 ## Commands - @bot [command]
+### Globals
 #### say/repeat - Repeats anything you type after the command
 
 #### show/get - Show details of Emoji or Trigger
@@ -41,7 +43,7 @@ ____
 * They ***MUST*** be whitespace separated
 * They can be jumbled up and in any order
 * Ignores capitalizations and punctuation
-* ***You must have Editing Permission to use this Command***
+* ***You must have Editing Permission (Set in EditPermissions.ids) to use this Command***
 
 #### del/remove/delete - Deletes an Emoji or Trigger
 * There **must** be an Emoji or Trigger
@@ -50,4 +52,20 @@ ____
 * If there are multiple Emojis or Triggers associated with the given one, will ask for confirmation
 	* There is no need to @mention, a simple yes/no in the same channel will suffice
 * Ignores capitalizations and punctuation
-* ***You must have Editing Permission to use this Command***
+* ***You must have Editing Permission (Set in EditPermissions.ids) to use this Command***
+
+### Channel Specific
+#### reset - Reset the Drinking counters back to zero
+* Will only look at the first word not including the @mention
+* Ignores capitalizations and punctuation
+* ***Can only be used if you have manages_messages permissions in that channel***
+#### count - Show anyone's or everyone's counters
+* Will only look at the first word not including the @mention
+* Ignores capitalizations and punctuation
+* Can be used by anyone if you @mention who you want to see
+* @mention no one to show anyone that has drank before
+* ***You may list multiple people but that can only be used if you have manages_messages permissions in that channel***
+#### force - Force someone to drink
+* Will only look at the first word not including the @mention
+* Ignores capitalizations and punctuation
+* ***Can only be used if you have manages_messages permissions in that channel***
