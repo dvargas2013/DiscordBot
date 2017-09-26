@@ -3,7 +3,7 @@ __pycache__/
 *.py[ocd]
 
 constants.py
-EditPermission.ids
-DzvBotMain.pid
+*.ids
+*.pid
 docs/
-reactions.data
+*.data

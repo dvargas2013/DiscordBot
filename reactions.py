@@ -3,6 +3,8 @@ from pickle import dumps, load
 from os.path import exists
 
 def translate(s): return ''.join(i for i in s if i.isalnum() or i in ' ')
+# TODO event logger to the changes of the data
+# self.dirty could be a string[] of changes and gets appended to a file
 
 class Reactions():
     def __init__(self):
