@@ -21,7 +21,7 @@ async def command(client,message):
     elif splits[0] in ['remove','delete','del']: await _commands.delete(client,message,splits[1:])
     elif splits[0] in ['say','repeat']:          await _commands.repeat(client,message,splits[1:])
     # react if nothing else
-    elif message.channel.is_private:             await _commands.react(client,message) 
+    elif message.channel.is_private:             await react(client,message) 
     # anything under this cant be in private
     elif splits[0] == 'reset':                   await drink.reset(client,message)
     elif splits[0] == 'count':                   await drink.count(client,message)
