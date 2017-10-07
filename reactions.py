@@ -9,6 +9,7 @@ def translate(s): return ''.join(i for i in s if i.isalnum() or i in ' ')
 # TODO event logger to the changes of the data
 # self.dirty could be a string[] of changes and gets appended to a file
 import itertools
+from random import shuffle
 class Reactions():
     def __init__(self):
         self.triggers = dict() # trigger -> set([emoji])
@@ -36,8 +37,12 @@ class Reactions():
     def getEmojisFromTriggersInMessage(self,message):
         message = translate(message.lower()).split()
         for w in message:
-            if w in self.customs: yield from self.customs.get(w,[])
-            if w in self.triggers: yield from self.triggers.get(w,[])
+            a,b = set(),set()
+            if w in self.customs: a = set(self.customs.get(w,[]))
+            if w in self.triggers: b = set(self.triggers.get(w,[]))
+            yielder = list(a.union(b))
+            shuffle(yielder)
+            yield from yielder
     def setCustoms(self,customs):
         self.customs = dict()
         for e in customs:
