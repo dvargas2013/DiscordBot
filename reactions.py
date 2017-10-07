@@ -2,6 +2,9 @@
 from pickle import dumps, load
 from os.path import exists
 
+# TODO make this sqlite
+from threading import Thread
+
 def translate(s): return ''.join(i for i in s if i.isalnum() or i in ' ')
 # TODO event logger to the changes of the data
 # self.dirty could be a string[] of changes and gets appended to a file
@@ -10,11 +13,10 @@ class Reactions():
     def __init__(self):
         self.triggers = dict() # trigger -> set([emoji])
         self.emojis = dict() # emoji -> set([trigger])
-        self.dirty = 0
+        self.customs = []
     def add(self,trigger,emoji):
         trigger = translate(trigger.lower())
         if not trigger: return
-        self.dirty = 1
         self.triggers[trigger] = self.triggers.get(trigger,set())
         self.triggers[trigger].add(emoji)
         self.emojis[emoji] = self.emojis.get(emoji,set())
@@ -22,39 +24,26 @@ class Reactions():
     def removeTrigger(self,trigger):
         trigger = translate(trigger.lower())
         if not trigger: return
-        self.dirty = 1
-        for emoji in self.triggers.pop(trigger,set()):
-            self.emojis.get(emoji,set()).discard(trigger)
+        for emoji in self.triggers.pop(trigger,set()): self.emojis.get(emoji,set()).discard(trigger)
     def removeEmoji(self,emoji):
-        self.dirty = 1
-        for trigger in self.emojis.pop(emoji,set()):
-            self.triggers.get(trigger,set()).discard(emoji)
-    def removePair(self,trigger,emoji):
+        for trigger in self.emojis.pop(emoji,set()): self.triggers.get(trigger,set()).discard(emoji)
+    def getTriggers(self): return set(list(self.triggers.keys())+[translate(e.name.lower()) for e in self.customs])
+    def getEmojis(self): return set(list(self.emojis.keys())+self.customs)
+    def getEmojisFromTrigger(self,trigger):
         trigger = translate(trigger.lower())
-        if not trigger: return
-        self.dirty = 1
-        self.triggers[trigger] = self.triggers.get(trigger,set())
-        self.triggers[trigger].discard(emoji)
-        self.emojis[emoji] = self.emojis.get(emoji,set())
-        self.emojis[emoji].discard(trigger)
-    def getTrigger(self,trigger):
-        trigger = translate(trigger.lower())
-        return list(self.triggers.get(trigger,[]))
-    def getEmoji(self,emoji): return list(self.emojis.get(emoji,[]))
-    def getTriggersFromMessage(self,message):
-        message = translate(message.lower()).split()
+        return list(self.triggers.get(trigger,[]))+[e for e in self.customs if translate(e.name.lower()) == trigger]
+    def getTriggersFromEmoji(self,emoji): return list(self.emojis.get(emoji,[]))+[translate(e.name.lower()) for e in self.customs if e == emoji]
+    def getEmojisFromTriggersInMessage(self,message):
+        message = set(translate(message.lower()).split())
+        for e in self.customs:
+            if e.name in message: yield e
         for w in message:
-            if w in self.triggers: yield w
-    def test(self):
-        for t,E in self.triggers.values():
-            for e in E: assert t in self.emojis[e]
-        for e,T in self.emojis.values():
-            for t in T: assert e in self.triggers[t]
-    def write(self,f="reactions.data"):
-        if self.dirty:
-            self.dirty = 0
-            with open(f,'wb') as fi: fi.write(dumps(self))
-            print("Saved "+f)
+            if w in self.triggers: yield from self.triggers.get(w,[])
+    def setCustoms(self,customs): self.customs = customs
+    def _write(self,f="reactions.data"):
+        with open(f,'wb') as fi: fi.write(dumps(self))
+        print("Saved "+f)
+    def write(self): Thread(target = self._write).start()
     def read(f="reactions.data"):
         if not exists(f):
             print("No Reaction Data")
@@ -62,3 +51,8 @@ class Reactions():
         else:
             print("Reactions Data Loaded")
             with open(f,'rb') as fi: return load(fi)
+    def overwrite(self):
+        r = Reactions()
+        r.triggers = self.triggers
+        r.emojis = self.emojis
+        r.write()

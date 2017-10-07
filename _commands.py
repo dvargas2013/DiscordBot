@@ -33,27 +33,29 @@ async def add(client,message,splits):
                 for t in triggers:
                     Reactions.add(t,e)
             m = "Added %s and %s"%(listify(emojis),listify(triggers))
+            print(m)
+            Reactions.write()
     await client.send_message(message.channel,m)
 
 from random import sample # Used when returning 10 random triggers
 async def show(client,message,splits):
     if not splits:
-        T = Reactions.triggers.keys()
+        T = Reactions.getTriggers()
         if T: m = "Here are 10 random triggers I have "+listify(sample(list(T),10))
         else: m = "I don't have triggers set"
     elif isEmoji(splits[0]):
         emoji = splits[0]
-        T = Reactions.getEmoji(emoji)
+        T = Reactions.getTriggersFromEmoji(emoji)
         if len(T): m = '%s is triggered by %s'%(emoji,listify(T))
         else:      m = '%s isn\'t triggered by anything ... yet'%emoji
     else:
         trigger = splits[0]
         E = []
         if "..." not in message.clean_content:
-            E = Reactions.getTrigger(trigger)
-        if len(E): m = '%s triggers %s'%(trigger,listify(E))
+            E = Reactions.getEmojisFromTrigger(trigger)
+        if len(E): m = '%s triggers %s'%(trigger,listify(str(e) for e in E))
         else:
-            T = [t for t in Reactions.triggers.keys() if t.startswith(trigger.lower())]
+            T = [t for t in Reactions.getTriggers() if t.startswith(trigger.lower())]
             if len(T) == 1: m = '"%s" is the only trigger that starts with "%s..."'%(T[0],trigger)
             elif T: m = '%s are all triggers that start with "%s..."'%(listify(T),trigger)
             else: m = '"%s" doesn\'t trigger anything ... yet'%trigger
@@ -68,12 +70,12 @@ async def delete(client,message,splits):
     else:
         # Both were almost exactly the same so to reduce code repetition I did this
         if isEmoji(splits[0]):
-            get = Reactions.getEmoji
+            get = Reactions.getTriggersFromEmoji
             none = " isn't triggered by anything ..."
             rem = Reactions.removeEmoji
             sure = " triggered by "
         else:
-            get = Reactions.getTrigger
+            get = Reactions.getEmojisFromTrigger
             none = " doesn't trigger anything ..."
             rem = Reactions.removeTrigger
             sure = " triggers "
@@ -84,6 +86,8 @@ async def delete(client,message,splits):
         elif len(C) == 1:
             rem(s0) # rem is defined above
             m = '"%s" has been removed'%(s0)
+            print(m)
+            Reactions.write()
         else:
             m = '"%s"%s%s. Are you sure you want to remove?'%(s0,sure,listify(C))
             await client.send_message(message.channel,m)
@@ -93,6 +97,8 @@ async def delete(client,message,splits):
             elif 'yes' in msg.clean_content.lower():
                 rem(s0) # rem is defined above
                 m = '"%s" has been removed'%s0
+                print(m)
+                Reactions.write()
             else: m = 'Deletion of "%s" has been canceled'%s0
     await client.send_message(message.channel,m)
 

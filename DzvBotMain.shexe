@@ -1,5 +1,10 @@
 #!/bin/bash
-dir="$( cd "$(dirname "${BASH_SOURCE[0]}")" && pwd )"$"/"
-cd "$dir"
+cd $(dirname "$0")
 
-python3 DzvBotMain.py & disown
+function stamp() {
+	while read line; do
+		echo "$(date +"%m/%d/%y %I:%M:%S %p"): ${line}"
+	done
+}
+
+python3 DzvBotMain.py | stamp >> bot.log & disown

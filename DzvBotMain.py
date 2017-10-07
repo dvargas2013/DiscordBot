@@ -16,7 +16,6 @@ chdir()
 print("Current Directory Set To:",os.getcwd())
 if not os.path.exists(double_stopper): 
     with open(double_stopper, "wb") as f: f.write(CUR)
-print()
 
 import mmap
 mmapfile = open(double_stopper, "r+b")
@@ -36,7 +35,7 @@ from constants import ClientID,Token
 
 import discord
 import asyncio
-from commands import command, react
+import commands
 
 __doc__ = '''https://discordapp.com/oauth2/authorize?&client_id=%s&scope=bot&permissions=11328'''%ClientID
 
@@ -56,15 +55,16 @@ async def on_message(message):
     # If I was mentioned you want me to do something
     if (client.user.mentioned_in(message) and client.user in message.mentions) or message.channel.is_private:
         if DEBUG: print(message.clean_content)
-        await command(client,message)
+        await commands.command(client,message)
     else: # If not mentioned I might react c;
-        await react(client,message)
+        await commands.react(client,message)
+    sys.stdout.flush()
 
 from threading import Thread
 # I dont run it directly cause I don't trust it to die on SIGTERM
 t = Thread(target = lambda: client.run(Token), daemon=True)
 t.start()
-
+sys.stdout.flush()
 if DEBUG:
     print(__doc__)
     from discord.utils import find # when you have a list of stuff to look through use find to find stuff for you

@@ -14,6 +14,7 @@ puncRemover = str.maketrans('','',punctuation)
 Reactions = _commands.Reactions
 
 async def command(client,message):
+    Reactions.setCustoms( list(client.get_all_emojis()) )
     splits = [i for i in message.content.lower().translate(puncRemover).split() if len(i)<15]
     # This section right here is probably the cleanest I've ever written code
     if splits[0] in ['add','set']:               await _commands.add(client,message,splits[1:])
@@ -33,8 +34,5 @@ async def react(client,message): # if its not a command it goes into reactions
     if _commands.dont_react(message): return
     if "DRINK" in message.content.split() and drink.drinking_allowed(message): await drink.drink(client,message)
     # It's just a regular message nothing else to do but add a reaction
-    T = list(Reactions.getTriggersFromMessage(message.content))
-    if not T: return
-    for t in T:
-        for e in Reactions.triggers.get(t,set()):
-            await client.add_reaction(message,e)
+    for e in Reactions.getEmojisFromTriggersInMessage(message.content):
+        await client.add_reaction(message,e)
