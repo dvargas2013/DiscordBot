@@ -8,12 +8,12 @@ from threading import Thread
 def translate(s): return ''.join(i for i in s if i.isalnum() or i in ' ')
 # TODO event logger to the changes of the data
 # self.dirty could be a string[] of changes and gets appended to a file
-
+import itertools
 class Reactions():
     def __init__(self):
         self.triggers = dict() # trigger -> set([emoji])
         self.emojis = dict() # emoji -> set([trigger])
-        self.customs = []
+        self.customs = dict()
     def add(self,trigger,emoji):
         trigger = translate(trigger.lower())
         if not trigger: return
@@ -27,19 +27,23 @@ class Reactions():
         for emoji in self.triggers.pop(trigger,set()): self.emojis.get(emoji,set()).discard(trigger)
     def removeEmoji(self,emoji):
         for trigger in self.emojis.pop(emoji,set()): self.triggers.get(trigger,set()).discard(emoji)
-    def getTriggers(self): return set(list(self.triggers.keys())+[translate(e.name.lower()) for e in self.customs])
-    def getEmojis(self): return set(list(self.emojis.keys())+self.customs)
+    def getTriggers(self): return set(list(self.triggers.keys())+list(self.customs.keys()))
+    def getEmojis(self): return set(list(self.emojis.keys())+list(itertools.chain(*self.customs.values())))
     def getEmojisFromTrigger(self,trigger):
         trigger = translate(trigger.lower())
-        return list(self.triggers.get(trigger,[]))+[e for e in self.customs if translate(e.name.lower()) == trigger]
-    def getTriggersFromEmoji(self,emoji): return list(self.emojis.get(emoji,[]))+[translate(e.name.lower()) for e in self.customs if e == emoji]
+        return list(self.triggers.get(trigger,[]))+list(self.customs.get(trigger,[]))
+    def getTriggersFromEmoji(self,emoji): return list(self.emojis.get(emoji,[]))
     def getEmojisFromTriggersInMessage(self,message):
-        message = set(translate(message.lower()).split())
-        for e in self.customs:
-            if e.name in message: yield e
+        message = translate(message.lower()).split()
         for w in message:
+            if w in self.customs: yield from self.customs.get(w,[])
             if w in self.triggers: yield from self.triggers.get(w,[])
-    def setCustoms(self,customs): self.customs = customs
+    def setCustoms(self,customs):
+        self.customs = dict()
+        for e in customs:
+            n = translate(e.name.lower())
+            self.customs[e.name] = self.customs.get(e.name,[])
+            self.customs[e.name].append(e)
     def _write(self,f="reactions.data"):
         with open(f,'wb') as fi: fi.write(dumps(self))
         print("Saved "+f)
