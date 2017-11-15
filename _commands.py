@@ -46,19 +46,20 @@ async def show(client,message,splits):
     elif isEmoji(splits[0]):
         emoji = splits[0]
         T = Reactions.getTriggersFromEmoji(emoji)
-        if len(T): m = '%s is triggered by %s'%(emoji,listify(T))
+        if len(T): m = '%s: %s'%(emoji,listify(T))
         else:      m = '%s isn\'t triggered by anything ... yet'%emoji
     else:
         trigger = splits[0]
         E = []
+        m = False
         if "..." not in message.clean_content:
             E = Reactions.getEmojisFromTrigger(trigger)
-        if len(E): m = '%s triggers %s'%(trigger,listify(str(e) for e in E))
+            if len(E): m = '%s: %s'%(trigger,listify(str(e) for e in E))
         else:
             T = [t for t in Reactions.getTriggers() if t.startswith(trigger.lower())]
             if len(T) == 1: m = '"%s" is the only trigger that starts with "%s..."'%(T[0],trigger)
             elif T: m = '%s are all triggers that start with "%s..."'%(listify(T),trigger)
-            else: m = '"%s" doesn\'t trigger anything ... yet'%trigger
+        if not m: m = '"%s" doesn\'t trigger anything ... yet'%trigger
     await client.send_message(message.channel,m)
 
 

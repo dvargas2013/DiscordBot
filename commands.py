@@ -34,5 +34,8 @@ async def react(client,message): # if its not a command it goes into reactions
     if _commands.dont_react(message): return
     if "DRINK" in message.content.split() and drink.drinking_allowed(message): await drink.drink(client,message)
     # It's just a regular message nothing else to do but add a reaction
+    c = 0
     for e in Reactions.getEmojisFromTriggersInMessage(message.content):
         await client.add_reaction(message,e)
+        c += 1
+        if c == 20: break
