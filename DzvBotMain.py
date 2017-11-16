@@ -38,7 +38,7 @@ import asyncio
 import commands
 
 __doc__ = '''https://discordapp.com/oauth2/authorize?&client_id=%s&scope=bot&permissions=11328'''%ClientID
-def listin(stringsSearch,mainString): return any((i in mainString) for i in stringsSearch)
+def listin(stringsSearch,mainString): return any(any(j.startswith(i) for j in mainString) for i in stringsSearch)
 lastLewd = None
 from _commands import dont_react
 async def checkForLewd(client,message):
