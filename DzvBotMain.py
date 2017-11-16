@@ -55,7 +55,7 @@ async def checkForLewd(client,message):
         # dont update time in order to check if its <20 in sfw channels
     elif time < 10: # 10 second cooldown
         return
-    stringk=message.content.lower().translate(commands.puncRemover)
+    stringk=set(message.content.lower().translate(commands.puncRemover).split())
     strings=[]
     active = False # if active is true it will warn in other channels. if it's false it turns off the warning
     if "nudes" in stringk:                             strings.append("Send some to me too")
