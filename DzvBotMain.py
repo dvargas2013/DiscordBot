@@ -44,6 +44,8 @@ from _commands import dont_react
 async def checkForLewd(client,message):
     global lastLewd
     if dont_react(message): return
+    if "sfw!" in set(message.content.lower().split()): return
+    
     if lastLewd == None:
         lastLewd = message.timestamp
         time = 100
@@ -58,7 +60,7 @@ async def checkForLewd(client,message):
     stringk=set(message.content.lower().translate(commands.puncRemover).split())
     strings=[]
     active = False # if active is true it will warn in other channels. if it's false it turns off the warning
-    if "nudes" in stringk:                             strings.append("Send some to me too")
+    if listin(["nude"],stringk):                       strings.append("Send some to me too")
     if listin(["butt","ass"],stringk):                 strings.append("( ͡° ͜ʖ ͡°) Butt?")
     if listin(["spank","choke","kink"],stringk):       strings.append("> tries to smooth out kinks\n> fails")
     if listin(["sex","bang"],stringk):                 strings.append("> MOANS")
@@ -67,10 +69,10 @@ async def checkForLewd(client,message):
     if listin(["vagina","pussy"],stringk):             strings+="🐱 😺 😸 😹 😽 😻 😿 😼".split()
     if listin(["penis","dick","cock","dong"],stringk): strings.append("Are you talking about 🍆 again?")
     if strings: active = True # if one of those top ones are present you get a warning. these bottoms ones dont
-    if "tit" in stringk:                       strings.append("We're talking about birds right?")
+    if listin(["tit"],stringk):                strings.append("We're talking about birds right?")
     if listin(["hot","hawt"],stringk):         strings.append("Don't worry I'll send some 🍧")
     if listin(["lewd","dirty","sin"],stringk): strings.append("> sends to the 🛁")
-    if "lap" in stringk:                       strings.append("> sits")
+    if listin(["lap"],stringk):                strings.append("> sits")
     if listin(["gay","fag","virgin"],stringk): strings.append("I know you are but what am I?")
     if strings:
         # no matter the reason. dont spam other channels
