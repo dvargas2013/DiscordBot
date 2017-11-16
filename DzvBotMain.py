@@ -58,6 +58,7 @@ async def checkForLewd(client,message):
     elif time < 10: # 10 second cooldown
         return
     stringk=set(message.content.lower().translate(commands.puncRemover).split())
+    if DEBUG: print(stringk)
     strings=[]
     active = False # if active is true it will warn in other channels. if it's false it turns off the warning
     if listin(["nude"],stringk):                       strings.append("Send some to me too")
@@ -69,7 +70,7 @@ async def checkForLewd(client,message):
     if listin(["vagina","pussy"],stringk):             strings+="🐱 😺 😸 😹 😽 😻 😿 😼".split()
     if listin(["penis","dick","cock","dong"],stringk): strings.append("Are you talking about 🍆 again?")
     if strings: active = True # if one of those top ones are present you get a warning. these bottoms ones dont
-    if listin(["tit"],stringk):                strings.append("We're talking about birds right?")
+    if listin(["tit","boob"],stringk):         strings+="We're talking about birds right?","***BOOBIES***"
     if listin(["hot","hawt"],stringk):         strings.append("Don't worry I'll send some 🍧")
     if listin(["lewd","dirty","sin"],stringk): strings.append("> sends to the 🛁")
     if listin(["lap"],stringk):                strings.append("> sits")
