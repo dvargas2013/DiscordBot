@@ -56,8 +56,10 @@ async def checkForLewd(client,message):
     if time > 2 and "bot" in message.clean_content:
         lastLewd = None # u get 2 second cooldown if u say bot
         # dont update time in order to check if its <20 in sfw channels
-    elif time < 10: # 10 second cooldown
-        return
+    elif time < 30: # 10 second cooldown
+        return # TODO have a message counter so it can do that instead of time
+        # or have a message counter and also have a time reset if it takes FOREVER for people to type
+        
     stringk=set(message.content.lower().translate(commands.puncRemover).split())
     strings=[]
     active = False # if active is true it will warn in other channels. if it's false it turns off the warning
@@ -77,7 +79,7 @@ async def checkForLewd(client,message):
     if listin(["gay","fag","virgin"],stringk):                                  strings.append("I know you are but what am I?")
     if strings:
         # no matter the reason. dont spam other channels
-        if message.channel.id != "238926790985252864" and time < 20: return
+        if message.channel.id != "238926790985252864" and time < 120: return
         
         if active and message.channel.id != "238926790985252864":
             await client.send_message(message.channel,"I see you are nsfw-ing in <#%s>. How about we all go into <#238926790985252864> c;"%message.channel.id)
