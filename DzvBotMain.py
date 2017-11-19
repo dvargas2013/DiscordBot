@@ -39,6 +39,7 @@ import commands
 
 __doc__ = '''https://discordapp.com/oauth2/authorize?&client_id=%s&scope=bot&permissions=11328'''%ClientID
 def listin(stringsSearch,mainString): return any(any(j.startswith(i) for j in mainString) for i in stringsSearch)
+def listinExact(stringsSearch,mainString): return any((i in mainString) for i in stringsSearch)
 lastLewd = None
 from _commands import dont_react
 async def checkForLewd(client,message):
@@ -58,10 +59,9 @@ async def checkForLewd(client,message):
     elif time < 10: # 10 second cooldown
         return
     stringk=set(message.content.lower().translate(commands.puncRemover).split())
-    if DEBUG: print(stringk)
     strings=[]
     active = False # if active is true it will warn in other channels. if it's false it turns off the warning
-    if listin(["nude"],stringk):                       strings.append("Send some to me too")
+    if listin(["nude"],stringk):                       strings.append("Send some to me too 💖")
     if listin(["butt","ass"],stringk):                 strings.append("( ͡° ͜ʖ ͡°) Butt?")
     if listin(["spank","choke","kink"],stringk):       strings.append("> tries to smooth out kinks\n> fails")
     if listin(["sex","bang"],stringk):                 strings.append("> MOANS")
@@ -70,11 +70,11 @@ async def checkForLewd(client,message):
     if listin(["vagina","pussy"],stringk):             strings+="🐱 😺 😸 😹 😽 😻 😿 😼".split()
     if listin(["penis","dick","cock","dong"],stringk): strings.append("Are you talking about 🍆 again?")
     if strings: active = True # if one of those top ones are present you get a warning. these bottoms ones dont
-    if listin(["tit","boob"],stringk):         strings+="We're talking about birds right?","***BOOBIES***"
-    if listin(["hot","hawt"],stringk):         strings.append("Don't worry I'll send some 🍧")
-    if listin(["lewd","dirty","sin"],stringk): strings.append("> sends to the 🛁")
-    if listin(["lap"],stringk):                strings.append("> sits")
-    if listin(["gay","fag","virgin"],stringk): strings.append("I know you are but what am I?")
+    if listin(["tit","boob"],stringk):                                          strings+=["We're talking about birds right?","***BOOBIES***"]
+    if listin(["hot","hawt"],stringk):                                          strings.append("Don't worry I'll send some 🍧")
+    if listin(["lewd","dirty"],stringk) or listinExact(["sin","sins"],stringk): strings.append("> sends to the 🛁")
+    if listin(["lap"],stringk):                                                 strings.append("> sits")
+    if listin(["gay","fag","virgin"],stringk):                                  strings.append("I know you are but what am I?")
     if strings:
         # no matter the reason. dont spam other channels
         if message.channel.id != "238926790985252864" and time < 20: return
