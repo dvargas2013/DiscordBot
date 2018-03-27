@@ -106,7 +106,7 @@ async def delete(client,message,splits):
 
 async def repeat(client,message,splits):
     m = message.content
-    m = m[m.find(splits[0]):]
+    m = m[m.lower().find(splits[0]):]
     await client.send_message(message.channel,m) # Repeat
     if not message.channel.is_private and message.server.get_member(client.user.id).permissions_in(message.channel).manage_messages:
         await client.delete_message(message) # And Delete Original Message (No one must know)
