@@ -11,14 +11,17 @@ function stamp() {
 echo -e "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0" > DzvBotMain.pid
 
 function loop(){
-	# if file doesnt exist cat returns a string of 0 length
-	memorymap=$(cat DzvBotMain.pid 2>/dev/null)
-	# if memorymap is empty that means the program ended because of an error and should restart
-	if [ "${#memorymap}" -eq 0 ]; then
-		python3 DzvBotMain.py | stamp >> bot.log
-	fi
-	# if memorymap still has stuff in it still that means that something else interrupted it
-	# or maybe an exception happened on main thread and it didnt get to run the reset code
+	while true; do
+		# if file doesnt exist cat returns a string of 0 length
+		memorymap=$(cat DzvBotMain.pid 2>/dev/null)
+		# if memorymap is empty that means the program ended because of an error and should restart
+		if [ "${#memorymap}" -eq 0 ]; then
+			python3 DzvBotMain.py | stamp >> bot.log
+		fi
+		# if memorymap still has stuff in it still that means that something else interrupted it
+		# or maybe an exception happened on main thread and it didnt get to run the reset code
+		sleep 30
+	done
 }
 
 loop & disown
