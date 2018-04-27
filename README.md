@@ -23,7 +23,7 @@ To run interactive debug mode you need to pass in a parameter to the call. `pyth
 
 If you just want to run it in the background without a terminal just run `python3 DzvBotMain.py & disown`  
 
-That's all the .shexe files do. Look at em if you dont believe me ;P  
+***Debug.shexe*** does the interactive debug mode exactly as explained but ***Main.shexe*** is a bit more advanced in that: it figures out if it was interrupted (either by sigterm or by another instance of the bot) or not. If the bot ends with no errors, ***Main.shexe*** will start another Instance  
 ____
 ## Commands - @bot [command]
 ### Globals

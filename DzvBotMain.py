@@ -69,6 +69,8 @@ if DEBUG:
     print(__doc__)
     from discord.utils import find # when you have a list of stuff to look through use find to find stuff for you
     RUN = client.loop.create_task # A lot of coroutines cant be run directly. Use this to run them
-else: t.join()
-
+else:
+    t.join()
+    if MM[:64] == CUR: # if ended of own volition (aka error killed the thread)
+        MM[:] = b"\x00"*len(MM[:])
 mmapfile.close()
