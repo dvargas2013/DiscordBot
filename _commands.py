@@ -17,15 +17,14 @@ def cantEdit(message):
 def isEmoji(x): return all(ord(x) > 255 for x in x)
 def listify(C): return ", ".join('%s'%r for r in sorted(C))
 def dont_react(message): return message.channel.id in ReactPerms
-
+def findEmojisInSplit(splits): return [i for i in splits if isEmoji(i)]
 
 async def add(client,message,splits):
     m = 'Usage: "%s add [emoji] [trigger]"'%client.user.mention
     if cantEdit(message):
         m = "You dont have permission to Edit Entries"
     elif len(splits)>1:
-        emoji = ""
-        emojis = [i for i in splits if isEmoji(i)] # find and remove the emoji
+        emojis = findEmojisInSplit(splits) # find and remove the emoji
         for e in emojis: splits.remove(e)
         triggers = splits
         if emojis and triggers:

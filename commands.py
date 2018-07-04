@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import discord
 import asyncio
+import re
+import discord.utils
 
 # command holder
 import _commands
@@ -30,12 +32,20 @@ async def command(client,message):
         usage = "show/say" if _commands.cantEdit(message) else "add/show/del/say"
         await client.send_message(message.channel,'I didn\'t understand that 😦 \n Usage: "%s %s"'%(client.user.mention,usage))
 async def react(client,message): # if its not a command it goes into reactions
-    Reactions.setCustoms( client.get_all_emojis() )
     if _commands.dont_react(message): return
     if "DRINK" in message.content.split() and drink.drinking_allowed(message): await drink.drink(client,message)
     # It's just a regular message nothing else to do but add a reaction
+    custom_emojis = list(client.get_all_emojis())
+    Reactions.setCustoms( custom_emojis )
     c = 0
     for e in Reactions.getEmojisFromTriggersInMessage(message.content):
         await client.add_reaction(message,e)
         c += 1
         if c == 20: break
+    # TODO make this better cause its not working unless theres a space between em
+    if c == 0: # if no triggers to react to . maybe there are some emojis added to the sentence you can just copy paste
+        for e in _commands.findEmojisInSplit(message.content.lower().translate(puncRemover).split()):
+            await client.add_reaction(message,e)
+        for e in re.findall('<:\S+:\d+>',message.content):
+            E = discord.utils.get(custom_emojis, id=e[e.rfind(':')+1:-1])
+            await client.add_reaction(message,E)
